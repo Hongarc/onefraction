@@ -3,17 +3,12 @@ import { Model, Document } from 'mongoose'
 import { getClassForDocument } from 'typegoose'
 
 export const TypegooseMiddleware: MiddlewareFn = async (_, next) => {
-  const result = await next()
+  let result = await next()
 
-  if (Array.isArray(result)) {
-    return result.map(item => (item instanceof Model ? convertDocument(item) : item))
+  if (!Array.isArray(result)) {
+    result = [result]
   }
-
-  if (result instanceof Model) {
-    return convertDocument(result)
-  }
-
-  return result
+  return result.map(item => (item instanceof Model ? convertDocument(item) : item))
 }
 
 function convertDocument(doc: Document) {
